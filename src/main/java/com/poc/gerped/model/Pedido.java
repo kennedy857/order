@@ -5,17 +5,23 @@ import jakarta.persistence.*;
 
 import java.util.List;
 
+@NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Builder
 @Entity
 public class Pedido {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
+
     private long numero;
-    @OneToOne
+
+    @OneToOne(cascade = CascadeType.ALL)
     private Cliente cliente;
-    @OneToMany
+
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name="pedido_id")
     private List<ItemPedido> itens;
 }

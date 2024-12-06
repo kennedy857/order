@@ -6,11 +6,13 @@ import lombok.*;
 import jakarta.persistence.*;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
-@Entity(name = "produto")
+@Entity
 public class Produto {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
     private Long codigo;
     private String descricao;
