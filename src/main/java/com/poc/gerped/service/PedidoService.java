@@ -7,5 +7,7 @@ import com.poc.gerped.exception.ServicosException;
 public interface PedidoService {
     Long salvar(PedidoRequest pedidoRequest) throws ServicosException;
 
-    PedidoResponse buscarPedido(Long numeroPedido);
+    PedidoResponse buscarPedido(Long numeroPedido) throws ServicosException;
+
+    void consolidarPedido(Long numeroPedido) throws ServicosException;
 }

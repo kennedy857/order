@@ -13,6 +13,8 @@ public final class Constantes {
 
     public static final String MENSAGEM_SUCESSO = "Sucesso";
 
+    public static final String MENSAGEM_NENHUM_CONTEUDO = "Nenhum Conteúdo";
+
     public static final String NUMERO_STATUS_200 = "200_OK";
 
     public static final String NUMERO_STATUS_204 = "204_OK";

@@ -2,6 +2,7 @@ package com.poc.gerped.service.impl;
 
 import com.poc.gerped.DTO.Response.PedidoResponse;
 import com.poc.gerped.DTO.Resquest.PedidoRequest;
+import com.poc.gerped.exception.ServicosException;
 import com.poc.gerped.model.Pedido;
 import com.poc.gerped.model.SequencialPedido;
 import com.poc.gerped.repository.PedidoRespository;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Year;
+import java.util.Objects;
 
 @Service
 public class PedidoServiceImpl implements PedidoService {
@@ -35,9 +37,19 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public PedidoResponse buscarPedido(Long numeroPedido) {
+    public PedidoResponse buscarPedido(Long numeroPedido) throws ServicosException {
 
-        return modelMapper.map(pedidoRespository.findByNumero(numeroPedido), PedidoResponse.class);
+        Pedido pedido = pedidoRespository.findByNumero(numeroPedido);
+
+        if(Objects.isNull(pedido)){
+            return null;
+        }
+        return modelMapper.map(pedido, PedidoResponse.class);
+    }
+
+    @Override
+    public void consolidarPedido(Long numeroPedido) throws ServicosException {
+
     }
 
     @Transactional
