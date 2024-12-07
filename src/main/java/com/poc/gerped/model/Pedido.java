@@ -18,6 +18,8 @@ public class Pedido {
 
     private long numero;
 
+    private boolean consolidado;
+
     @OneToOne(cascade = CascadeType.ALL)
     private Cliente cliente;
 

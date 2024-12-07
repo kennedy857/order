@@ -12,8 +12,6 @@ import jakarta.persistence.*;
 public class Produto {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
     private Long codigo;
     private String descricao;
     private BigDecimal valorUnitario;

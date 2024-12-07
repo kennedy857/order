@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.Year;
 import java.util.Objects;
 
@@ -48,7 +49,33 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public void consolidarPedido(Long numeroPedido) throws ServicosException {
+    public PedidoResponse consolidarPedido(Long numeroPedido) throws ServicosException {
+        Pedido pedido = pedidoRespository.findByNumero(numeroPedido);
+
+
+
+        if(Objects.nonNull(pedido)){
+            if(!pedido.isConsolidado()){
+                executarConsolidacao(pedido);
+            }else{
+                throw new ServicosException("Pedido já Consolidado", true);
+            }
+        }else{
+            throw new ServicosException("Pedido número : "+ numeroPedido+" não encontrato", true);
+        }
+
+        return modelMapper.map(pedidoRespository.save(pedido), PedidoResponse.class);
+    }
+
+    private void executarConsolidacao(Pedido pedido) throws ServicosException {
+        try {
+            pedido.getItens().forEach(item ->
+                    item.setValorTotalItem(item.getProduto().getValorUnitario().multiply(new BigDecimal(item.getQuantidade())))
+            );
+            pedido.setConsolidado(true);
+        }catch (Exception e ){
+            throw new ServicosException(e.getMessage(), false);
+        }
 
     }
 

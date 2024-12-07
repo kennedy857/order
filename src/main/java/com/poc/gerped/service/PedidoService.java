@@ -9,5 +9,5 @@ public interface PedidoService {
 
     PedidoResponse buscarPedido(Long numeroPedido) throws ServicosException;
 
-    void consolidarPedido(Long numeroPedido) throws ServicosException;
+    PedidoResponse consolidarPedido(Long numeroPedido) throws ServicosException;
 }

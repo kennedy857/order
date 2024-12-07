@@ -13,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 public class PedidoResponse {
 
+    private long numero;
+    private boolean consolidado;
     private ClienteResponse cliente;
     private List<ItemPedidoResponse> itens;
 }

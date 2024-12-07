@@ -33,7 +33,6 @@ public class PedidoController {
     }
 
     @GetMapping("/{numeroPedido}")
-
     public ResponseEntity<BaseResponseDTO> buscarPedido(@PathVariable Long numeroPedido) {
         PedidoResponse pedidoResponse;
         try {
@@ -45,11 +44,15 @@ public class PedidoController {
     }
 
     @PatchMapping("/consolidar/{numeroPedido}")
-    public void consolidarPedido(@PathVariable Long numeroPedido) {
-
+    public ResponseEntity<BaseResponseDTO> consolidarPedido(@PathVariable Long numeroPedido) {
+        PedidoResponse pedidoResponse;
         try {
-            pedidoService.consolidarPedido(numeroPedido);
+            pedidoResponse =  pedidoService.consolidarPedido(numeroPedido);
         } catch (ServicosException e) {
+            return Utils.tratarErroStatus400Status500(e);
         }
+        return Utils.getBaseResponseDTOResponseEntity(Constantes.HTTP_STATUS_200, Constantes.MENSAGEM_SUCESSO, Constantes.NUMERO_STATUS_200, pedidoResponse, HttpStatus.OK);
+
+
     }
 }

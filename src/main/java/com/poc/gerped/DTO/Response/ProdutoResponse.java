@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 public class ProdutoResponse {
 
     private Long codigo;
+    private String descricao;
 }
