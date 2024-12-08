@@ -1,5 +1,6 @@
 package com.poc.gerped.model;
 
+import com.poc.gerped.enums.Status;
 import lombok.*;
 import jakarta.persistence.*;
 
@@ -18,7 +19,8 @@ public class Pedido {
 
     private long numero;
 
-    private boolean consolidado;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @OneToOne(cascade = CascadeType.ALL)
     private Cliente cliente;
@@ -26,4 +28,11 @@ public class Pedido {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name="pedido_id")
     private List<ItemPedido> itens;
+
+    @PrePersist
+    protected void onPrePersist() {
+        if (status == null) {
+            status = Status.PENDENTE;
+        }
+    }
 }

@@ -2,6 +2,7 @@ package com.poc.gerped.service.impl;
 
 import com.poc.gerped.DTO.Response.PedidoResponse;
 import com.poc.gerped.DTO.Resquest.PedidoRequest;
+import com.poc.gerped.enums.Status;
 import com.poc.gerped.exception.ServicosException;
 import com.poc.gerped.model.Pedido;
 import com.poc.gerped.model.SequencialPedido;
@@ -52,13 +53,34 @@ public class PedidoServiceImpl implements PedidoService {
     public PedidoResponse consolidarPedido(Long numeroPedido) throws ServicosException {
         Pedido pedido = pedidoRespository.findByNumero(numeroPedido);
 
-
-
         if(Objects.nonNull(pedido)){
-            if(!pedido.isConsolidado()){
+            if(pedido.getStatus().equals(Status.CANCELADO)){
+                throw new ServicosException("Pedido Cancelado", true);
+            }
+            else if(pedido.getStatus().equals(Status.PENDENTE)){
                 executarConsolidacao(pedido);
             }else{
                 throw new ServicosException("Pedido já Consolidado", true);
+            }
+        }else{
+            throw new ServicosException("Pedido número : "+ numeroPedido+" não encontrato", true);
+        }
+
+        return modelMapper.map(pedidoRespository.save(pedido), PedidoResponse.class);
+    }
+
+    @Override
+    public PedidoResponse cancelarPedido(Long numeroPedido) throws ServicosException {
+        Pedido pedido = pedidoRespository.findByNumero(numeroPedido);
+
+        if(Objects.nonNull(pedido)){
+            if(pedido.getStatus().equals(Status.CONSOLIDADO)){
+                throw new ServicosException("Pedido já Consolidado", true);
+            }
+            else if(pedido.getStatus().equals(Status.PENDENTE)){
+                pedido.setStatus(Status.CANCELADO);
+            }else{
+                throw new ServicosException("Pedido já Cancelado", true);
             }
         }else{
             throw new ServicosException("Pedido número : "+ numeroPedido+" não encontrato", true);
@@ -72,7 +94,7 @@ public class PedidoServiceImpl implements PedidoService {
             pedido.getItens().forEach(item ->
                     item.setValorTotalItem(item.getProduto().getValorUnitario().multiply(new BigDecimal(item.getQuantidade())))
             );
-            pedido.setConsolidado(true);
+            pedido.setStatus(Status.CONSOLIDADO);
         }catch (Exception e ){
             throw new ServicosException(e.getMessage(), false);
         }

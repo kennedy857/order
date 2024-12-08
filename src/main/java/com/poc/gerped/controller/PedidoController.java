@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/pedidos")
+@RequestMapping("/pedido")
 public class PedidoController {
 
     @Autowired
@@ -43,16 +43,4 @@ public class PedidoController {
         }
     }
 
-    @PatchMapping("/consolidar/{numeroPedido}")
-    public ResponseEntity<BaseResponseDTO> consolidarPedido(@PathVariable Long numeroPedido) {
-        PedidoResponse pedidoResponse;
-        try {
-            pedidoResponse =  pedidoService.consolidarPedido(numeroPedido);
-        } catch (ServicosException e) {
-            return Utils.tratarErroStatus400Status500(e);
-        }
-        return Utils.getBaseResponseDTOResponseEntity(Constantes.HTTP_STATUS_200, Constantes.MENSAGEM_SUCESSO, Constantes.NUMERO_STATUS_200, pedidoResponse, HttpStatus.OK);
-
-
-    }
 }

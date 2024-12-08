@@ -10,4 +10,6 @@ public interface PedidoService {
     PedidoResponse buscarPedido(Long numeroPedido) throws ServicosException;
 
     PedidoResponse consolidarPedido(Long numeroPedido) throws ServicosException;
+
+    PedidoResponse cancelarPedido(Long numeroPedido) throws ServicosException;
 }
