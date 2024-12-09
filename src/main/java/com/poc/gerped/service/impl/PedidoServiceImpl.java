@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Year;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -135,4 +136,11 @@ public class PedidoServiceImpl implements PedidoService {
 
         return Long.parseLong(anoAtual + String.format("%05d", sequencialPedido.getSequencial()));
     }
+
+    private void validarDuplicidadePedido(List<PedidoRequest> pedidoRequests){
+        HashSet<String> hashes = pedidoRespository.findHashPedidoPendenteByClient();
+
+
+    }
+
 }
