@@ -17,29 +17,22 @@ public interface PedidoRespository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByClienteDocumento(String cliente);
 
     @Query(value =
-            "SELECT \n" +
-            "    md5(\n" +
-            "        CONCAT(\n" +
-            "            c.documento, '-',\n" +
-            "            string_agg(\n" +
-            "                CONCAT(\n" +
-            "                    ip.produto_codigo, '-', \n" +
-            "                    ip.quantidade\n" +
-            "                ), '|'\n" +
-            "                ORDER BY ip.produto_codigo, ip.quantidade\n" +
-            "            )\n" +
-            "        )\n" +
-            "    ) AS hash_pedido_com_cliente\n" +
-            "FROM \n" +
-            "    pedido p\n" +
-            "JOIN \n" +
-            "    cliente c ON c.id = p.cliente_id\n" +
-            "JOIN \n" +
-            "    item_pedido ip ON ip.pedido_id = p.id\n" +
-            "WHERE \n" +
-            "    c.documento = '701'\n" +
-            "    and p.status LIKE 'PENDENTE'\n" +
-            "GROUP BY \n" +
-            "    p.id, c.documento;",nativeQuery = true)
-    HashSet<String> findHashPedidoPendenteByClient();
+                    " SELECT"+
+                    "    md5(string_agg(" +
+                    "        CONCAT(" +
+                    "            ip.produto_codigo, '-', " +
+                    "            ip.quantidade" +
+                    "        ), '|'" +
+                    "        ORDER BY ip.produto_codigo, ip.quantidade" +
+                    "    )) AS hash_item_pedido" +
+                    " FROM " +
+                    "    pedido p" +
+                    " JOIN " +
+                    "    cliente c ON p.cliente_id = c.id" +
+                    " JOIN " +
+                    "    item_pedido ip ON ip.pedido_id = p.id" +
+                    " WHERE " +
+                    "    c.documento = :cliente and p.status like 'PENDENTE'" +
+                    " GROUP BY p.id;",nativeQuery = true)
+    HashSet<String> findHashPedidoPendenteByClient(@Param("cliente") String cliente);
 }

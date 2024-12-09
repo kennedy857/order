@@ -22,7 +22,7 @@ public class Pedido {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     private Cliente cliente;
 
     @OneToMany(cascade = CascadeType.ALL)

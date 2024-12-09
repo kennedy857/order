@@ -15,10 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Year;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +43,9 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public List<Long> salvar(List<PedidoRequest> pedidosRequest) throws ServicosException {
+
+        pedidosRequest = validarDuplicidadePedido(pedidosRequest);
+
         List<Pedido> pedidos = pedidosRequest .stream() .map(p -> modelMapper.map(p, Pedido.class)) .collect(Collectors.toList());
 
         pedidos.forEach(p -> p.setNumero(gerarNumeroPedido()));
@@ -137,10 +140,51 @@ public class PedidoServiceImpl implements PedidoService {
         return Long.parseLong(anoAtual + String.format("%05d", sequencialPedido.getSequencial()));
     }
 
-    private void validarDuplicidadePedido(List<PedidoRequest> pedidoRequests){
-        HashSet<String> hashes = pedidoRespository.findHashPedidoPendenteByClient();
+    private List<PedidoRequest> validarDuplicidadePedido(List<PedidoRequest> pedidoRequests){
+        Map<String, HashSet<String>> mapClienteHashes = new HashMap<>();
+        List<PedidoRequest> pedidosValidos = new ArrayList<>();
 
+        pedidoRequests.forEach(pedidoRequest -> {
+            if(!mapClienteHashes.containsKey(pedidoRequest.getCliente().getDocumento())) {
+                mapClienteHashes.put(pedidoRequest.getCliente().getDocumento(), pedidoRespository.findHashPedidoPendenteByClient(pedidoRequest.getCliente().getDocumento()));
+            }
+        });
 
+        pedidoRequests.forEach(pedidoRequest -> {
+            if(!mapClienteHashes.get(pedidoRequest.getCliente().getDocumento()).contains(gerarHash(pedidoRequest))){
+                pedidosValidos.add(pedidoRequest);
+            }
+        });
+
+        return pedidosValidos;
+    }
+
+    private String gerarHash(PedidoRequest pedido){
+        try {
+            // Ordena os itens pelo código do produto para consistência
+            List<String> dadosOrdenados = pedido.getItens().stream()
+                    .sorted((a, b) -> Long.compare(a.getProduto().getCodigo(), b.getProduto().getCodigo()))
+                    .map(item -> item.getProduto().getCodigo() + "-" + item.getQuantidade())
+                    .collect(Collectors.toList());
+
+            // Concatena os dados em uma única string, separando os itens com "|"
+            String dadosConcatenados = String.join("|", dadosOrdenados);
+
+            // Calcula o hash MD5
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] hash = md.digest(dadosConcatenados.getBytes());
+
+            // Converte o hash para uma string hexadecimal
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Erro ao calcular MD5", e);
+        }
     }
 
 }
