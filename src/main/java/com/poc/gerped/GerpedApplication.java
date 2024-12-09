@@ -20,9 +20,6 @@ public class GerpedApplication {
 	public ModelMapper modelMapper(){
 		var modelMapper = new ModelMapper();
 
-		//modelMapper.createTypeMap(Pedido.class, PedidoResponse.class)
-		//		.<String>addMapping(origem -> origem.getCliente().getNome(), (destino, value) -> destino.getCliente().setNome(value));
-
 		return modelMapper;
 	}
 }

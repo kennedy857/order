@@ -16,7 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Year;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class PedidoServiceImpl implements PedidoService {
@@ -39,8 +41,30 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public PedidoResponse buscarPedido(Long numeroPedido) throws ServicosException {
+    public List<Long> salvar(List<PedidoRequest> pedidosRequest) throws ServicosException {
+        List<Pedido> pedidos = pedidosRequest .stream() .map(p -> modelMapper.map(p, Pedido.class)) .collect(Collectors.toList());
 
+        pedidos.forEach(p -> p.setNumero(gerarNumeroPedido()));
+
+         return pedidoRespository.saveAll(pedidos).stream()
+                 .map(Pedido::getNumero)
+                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PedidoResponse> buscarPedidosCliente(String documentoCliente) throws ServicosException {
+
+        List<Pedido> pedidos = pedidoRespository.findByClienteDocumento(documentoCliente);
+
+        if(Objects.isNull(pedidos)){
+            return null;
+        }
+
+        return pedidos.stream().map(p -> modelMapper.map(p, PedidoResponse.class)) .toList();
+    }
+
+    @Override
+    public PedidoResponse buscarPedido(Long numeroPedido) throws ServicosException {
         Pedido pedido = pedidoRespository.findByNumero(numeroPedido);
 
         if(Objects.isNull(pedido)){

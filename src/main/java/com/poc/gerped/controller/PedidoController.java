@@ -12,7 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/pedido")
@@ -32,6 +34,19 @@ public class PedidoController {
         return Utils.getBaseResponseDTOResponseEntity(Constantes.HTTP_STATUS_200, Constantes.MENSAGEM_SUCESSO, Constantes.NUMERO_STATUS_200, numeroPedido, HttpStatus.OK);
     }
 
+    @PostMapping("lote")
+    public ResponseEntity<BaseResponseDTO> criarLotePedido(@RequestBody List<PedidoRequest> pedidosRequest) {
+        List<Long> numerosPedido;
+        try {
+            numerosPedido = pedidoService.salvar(pedidosRequest.stream()
+                    .distinct()
+                    .collect(Collectors.toList()));
+        } catch (ServicosException e) {
+            return Utils.tratarErroStatus400Status500(e);
+        }
+        return Utils.getBaseResponseDTOResponseEntity(Constantes.HTTP_STATUS_200, Constantes.MENSAGEM_SUCESSO, Constantes.NUMERO_STATUS_200, numerosPedido, HttpStatus.OK);
+    }
+
     @GetMapping("/{numeroPedido}")
     public ResponseEntity<BaseResponseDTO> buscarPedido(@PathVariable Long numeroPedido) {
         PedidoResponse pedidoResponse;
@@ -41,6 +56,18 @@ public class PedidoController {
         } catch (ServicosException e) {
             return Utils.getBaseResponseDTOResponseEntity(Constantes.HTTP_STATUS_500, e.getMessage(), Constantes.NUMERO_STATUS_500, numeroPedido, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("lote")
+    public ResponseEntity<BaseResponseDTO> buscarPedidosLote(@RequestParam(required = false) String documentoCliente) {
+        List <PedidoResponse> pedidosResponse;
+        try {
+            pedidosResponse =  pedidoService.buscarPedidosCliente(documentoCliente);
+            return Utils.getBaseResponseDTOResponseEntity(Constantes.HTTP_STATUS_200, Constantes.MENSAGEM_SUCESSO, Constantes.NUMERO_STATUS_200, pedidosResponse, HttpStatus.OK);
+        } catch (ServicosException e) {
+            return Utils.getBaseResponseDTOResponseEntity(Constantes.HTTP_STATUS_500, e.getMessage(), Constantes.NUMERO_STATUS_500, null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
 }
