@@ -19,18 +19,15 @@ public class GerenciarPedidoController {
     @Autowired
     PedidoService pedidoService;
 
-
     @PutMapping("/consolidar/{numeroPedido}")
     public ResponseEntity<BaseResponseDTO> consolidarPedido(@PathVariable Long numeroPedido) {
         PedidoResponse pedidoResponse;
         try {
-            pedidoResponse =  pedidoService.consolidarPedido(numeroPedido);
+            pedidoResponse = pedidoService.consolidarPedido(numeroPedido);
         } catch (ServicosException e) {
             return Utils.tratarErroStatus400Status500(e);
         }
         return Utils.getBaseResponseDTOResponseEntity(Constantes.HTTP_STATUS_200, Constantes.MENSAGEM_SUCESSO, Constantes.NUMERO_STATUS_200, pedidoResponse, HttpStatus.OK);
-
-
     }
 
     @PutMapping("/cancelar/{numeroPedido}")
@@ -42,7 +39,5 @@ public class GerenciarPedidoController {
             return Utils.tratarErroStatus400Status500(e);
         }
         return Utils.getBaseResponseDTOResponseEntity(Constantes.HTTP_STATUS_200, Constantes.MENSAGEM_SUCESSO, Constantes.NUMERO_STATUS_200, pedidoResponse, HttpStatus.OK);
-
-
     }
 }

@@ -43,21 +43,15 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public List<Long> salvar(List<PedidoRequest> pedidosRequest) throws ServicosException {
-
         pedidosRequest = validarDuplicidadePedido(pedidosRequest);
-
         List<Pedido> pedidos = pedidosRequest .stream() .map(p -> modelMapper.map(p, Pedido.class)) .collect(Collectors.toList());
-
         pedidos.forEach(p -> p.setNumero(gerarNumeroPedido()));
 
-         return pedidoRespository.saveAll(pedidos).stream()
-                 .map(Pedido::getNumero)
-                 .collect(Collectors.toList());
+         return pedidoRespository.saveAll(pedidos).stream().map(Pedido::getNumero).collect(Collectors.toList());
     }
 
     @Override
     public List<PedidoResponse> buscarPedidosCliente(String documentoCliente) throws ServicosException {
-
         List<Pedido> pedidos = pedidoRespository.findByClienteDocumento(documentoCliente);
 
         if(Objects.isNull(pedidos)){
@@ -161,20 +155,12 @@ public class PedidoServiceImpl implements PedidoService {
 
     private String gerarHash(PedidoRequest pedido){
         try {
-            // Ordena os itens pelo código do produto para consistência
-            List<String> dadosOrdenados = pedido.getItens().stream()
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] hash = md.digest( pedido.getItens().stream()
                     .sorted((a, b) -> Long.compare(a.getProduto().getCodigo(), b.getProduto().getCodigo()))
                     .map(item -> item.getProduto().getCodigo() + "-" + item.getQuantidade())
-                    .collect(Collectors.toList());
+                    .collect(Collectors.joining("|")).getBytes());
 
-            // Concatena os dados em uma única string, separando os itens com "|"
-            String dadosConcatenados = String.join("|", dadosOrdenados);
-
-            // Calcula o hash MD5
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] hash = md.digest(dadosConcatenados.getBytes());
-
-            // Converte o hash para uma string hexadecimal
             StringBuilder hexString = new StringBuilder();
             for (byte b : hash) {
                 String hex = Integer.toHexString(0xff & b);

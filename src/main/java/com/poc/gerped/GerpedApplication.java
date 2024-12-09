@@ -1,7 +1,5 @@
 package com.poc.gerped;
 
-import com.poc.gerped.DTO.Response.PedidoResponse;
-import com.poc.gerped.model.Pedido;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
